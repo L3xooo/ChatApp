@@ -1,0 +1,167 @@
+{% include 'main.html' %}
+
+{% block content %}
+<style>
+    .friends-container-main{
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .friends-container{
+        border-radius: 1px solid blue;
+        display: flex;
+        align-items: center;
+        justify-items: center;
+    }
+    .profile{
+        margin: auto 0;
+        padding: 20px 20px;
+        border-radius: 5px;
+    }
+    .friends{
+        width: 700px;
+        background-color: var(--color-dark);
+        position: relative;
+        padding: 0 20px;
+        border-radius: 5px;
+    }
+
+    .friend{
+        min-width: 350px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--color-dark);
+        border-radius: 5px;
+        margin: 5px 5px;
+        padding: 10px 10px;
+    }
+    .sidebar{
+        position: relative;
+        border-radius: 5px;
+        background-color:var(--color-dark) ;
+    }
+    .top{
+        width: 100%;
+        left: 0%;
+        top: 0%;
+        padding: 1.5rem;
+        position: absolute;
+        background-color: var(--color-dark-light);
+    }
+
+    .sidebar .top{
+        border-radius: 5px 0 0 0;
+    }
+
+    .friends .top{
+        border-radius: 0 5px 0 0;
+    }
+    .top h3 {
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--color-light);
+    }
+
+    ul{
+        padding-top: 54px;
+        list-style: none;
+    }
+    .sidebar li{
+        
+        width: 100%;
+    }
+
+    .sidebar i{
+        padding-right: 10px;
+    }
+
+    .sidebar a{
+        height: 40px;
+        width: 180px;
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--color-dark-medium);
+    }
+
+    .sidebar ul li:last-child a {
+    border-bottom: 0px solid var(--color-dark-medium);
+    }
+
+    .sidebar a:hover{
+        background-color: #5c5d70;
+    }
+
+    .sidebar ul li:last-child a:hover {
+        border-radius: 0 0 5px 5px;
+    }
+
+    .friends form{
+        margin-bottom: 10px;
+        margin-top: 64px;
+    }
+
+    .header__search label{
+    width: 300px;
+    }
+
+    .profile-card{
+        padding: 10px 10px;
+    }
+</style>
+
+
+
+<div>
+    <div class="profile">
+        <div class="profile__avatar">
+            <div class="avatar avatar--large active">
+              <img src="{{user.avatar.url}}" />
+            </div>
+          </div>
+          <div class="profile__info">
+            <h3>{{user.name}}</h3>
+            <p>@{{user.username}}</p>
+          </div>
+    </div>
+    <div class="friends-container-main">
+        <div class="sidebar">
+            <div class="top"><h3>Friends</h3></div>
+            <ul>
+                <li><a href = ""><i class="fa-solid fa-user"></i>Your Friends</a></li>
+                <li><a href = ""><i class="fa-solid fa-user"></i>Add friend</a></li>
+                <li><a href = ""><i class="fa-solid fa-envelope"></i>Friends invites</a></li>
+                <li><a href = ""><i class="fa-solid fa-ban"></i>Blocked</a></li>
+            </ul>
+        </div>
+        <div class="friends">
+            <div class="top"><h3>Your Friends</h3></div>
+            <form class="header__search">
+                <label>
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                    <title>search</title>
+                    <path
+                      d="M32 30.586l-10.845-10.845c1.771-2.092 2.845-4.791 2.845-7.741 0-6.617-5.383-12-12-12s-12 5.383-12 12c0 6.617 5.383 12 12 12 2.949 0 5.649-1.074 7.741-2.845l10.845 10.845 1.414-1.414zM12 22c-5.514 0-10-4.486-10-10s4.486-10 10-10c5.514 0 10 4.486 10 10s-4.486 10-10 10z"
+                    ></path>
+                  </svg>
+                  <input name = 'q' placeholder="Search for more posts" method = "GET" />
+                </label>
+            </form>
+            <div class="friends-container">
+                
+                    {% for friend in friends %}
+                    <div class="profile-card">
+                        <div class="avatar avatar--medium">
+                            <img src="{{friend.avatar.url}}" />
+                          </div>
+                        {{friend.username}}
+                    </div>
+                    {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

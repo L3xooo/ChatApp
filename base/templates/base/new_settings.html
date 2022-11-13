@@ -1,0 +1,173 @@
+{% extends 'main.html' %}
+
+{%  block content %}
+<style>
+
+  .sidenav {
+  width: 10%;
+  height: 50%;
+  max-width: 48rem;
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translate(-50%, -46%);
+  background: var(--color-dark-light);
+  border-radius: 1rem;
+  box-shadow: 1px 1px 6px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.topics__list {
+  list-style: none;
+}
+
+.topics__list li a {
+  margin-top: 3rem;
+  font-weight: 500;
+  color: var(--color-light) !important;
+  display: block;
+}
+
+
+.layout__box {
+  width: 50%;
+  max-width: 48rem;
+  min-height: 40rem;
+  position: absolute;
+  top: 50%;
+  left: 60%;
+  transform: translate(-50%, -46%);
+  background-color: var(--color-dark);
+  border-radius: 1rem;
+  overflow: hidden;
+
+}
+
+.container {
+  max-width: 120rem;
+  width: 90%;
+  margin: auto;
+  
+}
+
+.layout--4 > .container > div:first-child {
+  flex-basis: 25%;
+}
+
+.layout--4 > .container > div:last-child {
+  flex-basis: 72%;
+}
+
+
+.layout {
+  margin-top: 2.4rem;
+}
+
+
+</style>
+      <main class="layout layout--4">
+        <div class="container">
+          <div class = "sidenav">
+            <ul class="topics__list">
+              <li>
+                <p align="center">
+                <a href="{% url 'home' %}" class="active" >General</a></p>
+              </li>
+              <li>
+                <p align="center">
+                <a href="{% url 'home' %}" class="active">Password</a></p>
+              </li>
+            </ul>
+          </div>  
+
+
+          <div class = "layout__box"> 
+            <div class="layout__boxHeader">
+              <div class="layout__boxTitle">
+                <a href="{% url 'home' %}">
+                  <svg
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                  >
+                    <title>arrow-left</title>
+                    <path
+                      d="M13.723 2.286l-13.723 13.714 13.719 13.714 1.616-1.611-10.96-10.96h27.625v-2.286h-27.625l10.965-10.965-1.616-1.607z"
+                    ></path>
+                  </svg>
+                </a>
+                <h3>Settings</h3>
+              </div>
+            </div>
+              
+                <div class="settings layout__body">
+                  <div class="settings__avatar">
+                    <div class="avatar avatar--large active">
+                      <img src="{{user.avatar.url}}" id="preview-avatar" />
+                    </div>
+                  </div>
+                  <form class="form" action="" method = "POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                      <div class="form__group form__avatar">
+                        <label for="avatar">Upload Avatar</label>
+                        <input
+                          class="form__hide"
+                          required
+                          type="file"
+                          name="avatar"
+                          id="avatar"
+                          accept="image/png, image/gif, image/jpeg"
+                        />
+                      </div>
+                      <div class="form__group">
+                        <label for="name">Full Name</label>
+                        <input
+                          id="name"
+                          name="name"
+                          type="text"
+                          placeholder="e.g. Dennis Ivy"
+                          value="{{user.name}}"
+                        />
+                      </div>
+                      <div class="form__group">
+                        <label for="username">Username</label>
+                        <input
+                          id="username"
+                          name="username"
+                          type="text"
+                          placeholder="e.g. @dennis_ivy"
+                          value="{{user.username}}"
+                        />
+                      </div>
+                      <div class="form__group">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" placeholder="e.g. user@domain.com" value ={{user.email}}>
+                      </div>
+                      <div class="form__group">
+                        <label for="about">About</label>
+                          {% if user.bio != None %}
+                          <textarea name="bio" id="bio" placeholder="Write about yourself...">{{user.bio}}</textarea>
+                          {% else %}
+                          <textarea name="bio" id="bio" placeholder="Write about yourself..."></textarea>
+                          {% endif %}
+                      </div>
+                    <div class="form__action">
+                      <a class="btn btn--dark" href="{% url 'user-profile' user.id %}">Cancel</a>
+                      <button class="btn btn--main" type="submit">Update Settings</button>
+                    </div>
+                  </form>
+      
+                </div>
+
+          </div>
+        </div>
+      </main>
+{% endblock content %}
+
