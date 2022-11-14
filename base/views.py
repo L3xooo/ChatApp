@@ -388,22 +388,6 @@ def chat_view(request, pk):
             seen=False, author=friend, reciever=user).count()
         arr.append(temp)
     foo = zip(friends, arr)
-    # for message in chat_messages:
-    #     print(message.created.strftime("%H:%M"))
-    # if request.method == "POST":
-
-    #     message = ChatMessage.objects.create(
-    #     body = request.POST.get('body'),
-    #     author = user,
-    #     reciever = to_user
-    #     )
-
-    #     if user not in to_user.chat_with.all():
-    #         to_user.chat_with.add(user)
-    #     if to_user not in user.chat_with.all():
-    #         user.chat_with.add(to_user)
-    #     return redirect('chat',pk = to_user.id)
-
     context = {'user': user, 'to_user': to_user,
                'chat_messages': chat_messages, 'foo': foo, 'message_count': message_count}
     return render(request, 'base/chat.html', context)
