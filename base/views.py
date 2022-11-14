@@ -393,10 +393,10 @@ def chat_view(request, pk):
     return render(request, 'base/chat.html', context)
 
 
-def test(request):
-    user = request.user
-    friends = user.chat_with.all()
-    return JsonResponse({"friends": list(friends.values())})
+#def test(request):
+#    user = request.user
+#    friends = user.chat_with.all()
+#    return JsonResponse({"friends": list(friends.values())})
 
 
 def test1(request, pk):
