@@ -1,72 +1,38 @@
-{% load static %}
-<header class="header header--loggedIn">
+<nav class="navbar navbar-expand-lg bg-dark " data-bs-theme="dark">
     <div class="container">
-      <a href="{% url 'home' %}" class="header__logo">
-        <img src="{% static 'images/logo.svg' %}" />
-        <h1>StudyBuddy</h1>
-      </a>
-      <form class="header__search" method = "GET" action ="{% url 'home' %}">
-        <label>
-          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-            <title>search</title>
-            <path
-              d="M32 30.586l-10.845-10.845c1.771-2.092 2.845-4.791 2.845-7.741 0-6.617-5.383-12-12-12s-12 5.383-12 12c0 6.617 5.383 12 12 12 2.949 0 5.649-1.074 7.741-2.845l10.845 10.845 1.414-1.414zM12 22c-5.514 0-10-4.486-10-10s4.486-10 10-10c5.514 0 10 4.486 10 10s-4.486 10-10 10z"
-            ></path>
-          </svg>
-          <input name = "q" placeholder="Search for rooms..." />
-        </label>
-      </form>
-        
-      <nav class="header__menu">
-        <!-- Not Logged In -->
-        <!-- <a href="/login.html">
-          <img src="./assets/avatar.svg" />
-          <p>Login</p>
-        </a> -->
-
-        <!-- Logged In -->
-        {% if request.user.is_authenticated %}
-        <div class="header__user">
-          {{request.user.id}}
-          <a href="{% url  'user-profile' request.user.id %}">
-            <div class="avatar avatar--medium active">
-              <img src="{{request.user.avatar.url}}" />
+        <div class="d-flex justify-content-between align-items-center" id="navbarSupportedContent" style="width: 100%;">
+            <a class="navbar-brand" href="{% url 'home' %}">ChatApp</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <form class="d-flex" role="search"  method="GET" action = "{% url 'home' %}" style="margin: 0;">
+                <input class="form-control me-2" name = "q" type="search" placeholder="Search" aria-label="Search" style="border-color:#6D5D6E; ">
+                <button class="btn" type="submit" style="border-color:#6D5D6E; color: #6D5D6E;"111>Search</button>
+            </form>
+            {% if request.user.is_authenticated %}
+            <div class="d-flex align-items-center">
+                <a href = "{% url  'user-profile' request.user.id %}">
+                    <div class="avatar avatar--small" style="padding-right: 8px;" >
+                        <img src="{{request.user.avatar.url}}" style=" border: 3px solid #b6aeb6;" />
+                    </div>
+                </a>
+                <div class="dropdown text-white">
+                    {{request.user.username}}
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;color: #6D5D6E;">                    
+                    </a>
+                    <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'settings' user.id %}">Settings</a></li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'login' %}" style="color: white;">Login</a>
+                    </li>
+                </ul>
+                {% endif %}   
             </div>
-            <p>{{request.user.name}}<span>@{{request.user.username}}</span></p>
-          </a>
-          <button class="dropdown-button">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-              <title>chevron-down</title>
-              <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
-            </svg>
-          </button>
         </div>
-        {% else %}
-        <!-- Not Logged In -->
-         <a href="{% url 'login' %}">
-          <img src="{% static 'images/avatar.svg' %}" />
-          <p>Login</p>
-        </a>
-        {% endif %}
-        <div class="dropdown-menu">
-          <a href="{% url 'settings' user.id %}" class="dropdown-link">
-            <i class="fa-solid fa-sliders"></i>
-            Settings</a> 
-          <a href="{% url 'logout' %}" class="dropdown-link">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            Logout</a>
-        </div>
-      </nav>
     </div>
-  </header>
-
-
-
-
-<!-- {% if request.user.is_authenticated %}
-<p> Hello {{request.user}}</p>
-<a href = "{% url 'logout' %}">Logout</a>
-{% else %}
-<a href = "{% url 'login' %}">Login</a>
-{% endif %}
- -->
+</nav>

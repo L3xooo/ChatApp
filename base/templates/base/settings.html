@@ -1,105 +1,61 @@
 {% extends 'main.html' %}
 
-{%  block content %}
+{% block content %}
+<main>
+    <div class="container my-5" style="height: 90vh;">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card bg-dark text-white" style="border-radius: 1rem;">
+              <div class="card-body p-5 text-center" >              
+                <div class="mb-md-2 mt-md-4">
+    
+                  <h2 class="fw-bold mb-2 text-uppercase">Settings</h2>
+                    <form action = "" method = "POST">
+                        {% csrf_token %}
+                        <div class="mb-1" style="display: flex; flex-direction: column;">
+                          <div class="avatar avatar--large mb-1" style="align-self: center; 
+                          border: 2px solid #6D5D6E;">
+                            <img src="{{user.avatar.url}}" />
+                          </div>
+                          <label for="formFile" class="form-label">Upload Avatar</label>
+                          <input class="preview-avatar form-control file" type="file" name = "avatar" id="avatar" accept="image/png, image/gif, image/jpeg">
+                        </div>
+                        <div class="form-outline form-white mb-1">
+                          <label class="form-label px-4" for="name">Full Name</label>
+                          <input type="text" value = {{user.name}} name = "name" id="name" class="form-control form-control-lg" />
+                        </div>
+                        <div class="form-outline form-white mb-1">
+                          <label class="form-label px-4" for="username">Username</label>
+                          <input type="text" value = {{user.username}} name = "username" id="username" class="form-control form-control-lg" />
+                        </div>
+                        <div class="form-outline form-white mb-1">
+                          <label class="form-label px-4" for="email">Email</label>
+                          <input type="email" value = "{{user.email}}" name = "email" placeholder="email@email.com" id="email" class="form-control form-control-lg" />
+                        </div>
+                        <div class="form-group form-white mb-3">
+                          <label class="form-label px-4 mb-1" for = "about">About</label>
+                            {% if user.bio != None %}
+                            <textarea class="form-control" name="bio" id="bio" rows="3">{{user.bio}}</textarea>
+                            {% else %}
+                            <textarea class="form-control" name="bio" id="bio" placeholder="Write about yourself..." id="bio" rows="3"></textarea>
+                            {% endif %}
+                        </div>
+                        <a href ="{% url 'password-change' user.id %}" class="mb-3 btn btn-outline-light btn-lg px-5">Change Password</a>
+                        <div class="d-flex justify-content-between">
+                          <a  href="{% url 'user-profile' user.id %}" class="aaa btn btn-outline-light btn-lg px-5">Cancel</a>
+                          <button class="aaa btn btn-outline-light btn-lg px-5">Update Settings</button>
+                        </div>
 
-<style>
-.btn--main1 {
-  background-color: var(--color-main);
-  color: var(--color-dark);
-}
 
-.form__action1 {
-  display: flex;
-  float: right;
-  gap: 3rem;
-}
-
-</style>
-
-    <main class="create-room layout">
-      <div class="container">
-        <div class="layout__box">
-          <div class="layout__boxHeader">
-            <div class="layout__boxTitle">
-              <a href="{% url 'home' %}">
-                <svg
-                  version="1.1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="32"
-                  height="32"
-                  viewBox="0 0 32 32"
-                >
-                  <title>arrow-left</title>
-                  <path
-                    d="M13.723 2.286l-13.723 13.714 13.719 13.714 1.616-1.611-10.96-10.96h27.625v-2.286h-27.625l10.965-10.965-1.616-1.607z"
-                  ></path>
-                </svg>
-              </a>
-              <h3>Settings</h3>
-            </div>
-          </div>
-
-          <div class="settings layout__body">
-            <div class="settings__avatar">
-              <div class="avatar avatar--large active">
-                <img src="{{user.avatar.url}}" id="preview-avatar" />
+                    </form>
+                </div>
+    
+                <div>
+                </div>
               </div>
             </div>
-            <form class="form" action="" method = "POST" enctype="multipart/form-data">
-              {% csrf_token %}
-                <div class="form__group form__avatar">
-                  <label for="avatar">Upload Avatar</label>
-                  <input
-                    class="form__hide"
-                    required
-                    type="file"
-                    name="avatar"
-                    id="avatar"
-                    accept="image/png, image/gif, image/jpeg"
-                  />
-                </div>
-                 <div class="form__group">
-                  <label for="name">Full Name</label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="e.g. Dennis Ivy"
-                    value="{{user.name}}"
-                  />
-                </div>
-                <div class="form__group">
-                  <label for="username">Username</label>
-                  <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    placeholder="e.g. @dennis_ivy"
-                    value="{{user.username}}"
-                  />
-                </div>
-                <div class="form__group">
-                  <label for="email">Email</label>
-                  <input id="email" name="email" type="email" placeholder="e.g. user@domain.com" value ={{user.email}}>
-                </div>
-                <div class="form__group">
-                  <label for="about">About</label>
-                    {% if user.bio != None %}
-                    <textarea name="bio" id="bio" placeholder="Write about yourself...">{{user.bio}}</textarea>
-                    {% else %}
-                    <textarea name="bio" id="bio" placeholder="Write about yourself..."></textarea>
-                    {% endif %}
-                </div>
-                <a class="btn btn--main" href="{% url 'password-change' user.id %}">Change password</a>
-              <div class="form__action1">
-                <a class="btn btn--dark" href="{% url 'user-profile' user.id %}">Cancel</a>
-                <button class="btn btn--main" type="submit">Update Settings</button>
-              </div>
-            </form>
-
           </div>
         </div>
-      </div>
-    </main>
+      </div>    
+</main>
 {% endblock content %}
-

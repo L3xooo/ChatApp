@@ -1,0 +1,225 @@
+{% include 'main.html' %}
+
+{%  block content %}
+<style>
+
+  .layout--2 > .container > div:first-child {
+    flex-basis: 25%;
+  }
+  
+  .layout--2 > .container > div:last-child {
+    flex-basis: 72%;
+  }
+  
+  .thread {
+    margin: 2rem 0;
+  }
+  
+  .threads {
+    background: var(--color-bg);
+    border-radius: 0.7rem;
+    overflow-y: auto;
+    height: 100%;
+    margin-top: 25vh;
+    padding: 4rem 2rem 4rem 2rem;
+  }
+  
+  .room__conversation {
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    height: 59%;
+  }
+  
+  .participant{
+      position: relative;
+      padding: 5px 5px;
+      margin-bottom: 2px;
+      border-radius: 5px;
+  }
+  
+  .participants__list {
+    padding:0rem;
+  
+  }
+  .room__topLeft h3{
+      margin: auto;
+  }
+  
+  .thread__details {
+    font-size: 1.4rem;
+  }
+  /* .thread__details:hover {
+    background-color: #22222b;
+  } */
+  
+  .line{
+    width: 300px;
+    background-color: var(--color-dark);
+    height: 1px;
+    align-self: center;
+  }
+  .date-separator{
+    color: var(--color-dark);
+    display: flex;
+    align-self: center;
+    justify-content: center;
+  }
+  
+  .participant .test{
+    display: flex;
+    width: 100%;
+    gap: 1.5rem;
+  }
+  
+  .participant:hover{
+    transition: 0.5s;
+    background-color: #5c5d70;
+  }
+  
+  .participant i{
+    visibility: hidden;
+  }
+  
+  .participant:hover i{ 
+    visibility: visible;
+  }
+  
+  .participant:hover .notification{
+    visibility: hidden;
+  }
+  .participants__list{
+    overflow: hidden;
+  }
+  
+  .participants__list:hover{
+    overflow-y: scroll;
+  }
+  .xmark{
+    cursor: pointer;
+    position: absolute; 
+    z-index: 1500;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .active{
+    background-color: #525364;
+  }
+  
+  .xmark:hover{
+    color: var(--color-main-light);
+  }
+  .notification{
+    background-color: rgb(222,48,48);
+    font-weight: 700;
+    position: absolute;
+    z-index: 1500;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    color: white;
+  }
+  
+  .class{
+    color: blue;
+  }
+  </style>
+
+
+    <main class="profile-page layout layout--2">
+      <div class="container">
+        <!--Participants Start -->
+        <div class="participants">
+          <h3 class="participants__top">Participants<span>({{participants.count}} Joined)</span></h3>
+          <div class="participants__list scroll" id = "TEST">
+            {% for user in participants %}
+            <div class="participant {% if user.id == to_user.id %} active {% endif %}">
+              <a href="{% url 'user-profile' user.id %}" class = "test">
+                <div class="avatar avatar--medium">
+                  <img src="{{user.avatar.url}}" />
+                </div>
+                <p>
+                  {{user.name}}
+                  <span>@{{user.username}}</span>
+                </p>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <!--Participants End -->
+
+        <!-- Room Start -->
+        <div class="room">
+          <div class="room__top">
+            <div class="room__topLeft">
+              <h3>Study Room</h3>
+            </div>
+          </div>
+    
+          <div class="room__box">
+            <div class="room__conversation">
+              <div id = "body" class="threads scroll" >
+                {% for message in room_messages %}
+                  {% ifchanged message.created.date %}
+                  <div class = "date-separator"><div class = "line"></div>{{message.created.date}}<div class = "line"></div></div>
+                  {% endifchanged %}
+                  {{datetime.now}}
+                  {% ifchanged message.author.username %}
+                    <div class="thread__top">
+                      <div class="thread__author">
+                        <a href="{% url 'user-profile' message.author.id %}" class="thread__authorInfo">
+                          <div class="avatar avatar--small">
+                            <img src="{{message.author.avatar.url}}" />
+                          </div>
+                          <span>@{{message.author.username}}</span>
+                        </a>
+                        <span class="thread__date">{{message.created|timesince}} ago</span>
+                      </div>
+                    </div>
+                   <div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">
+                      {{message.body}}
+                    </div> 
+                  {% else %}
+                    {% ifchanged message.created.date %}
+                      <div class="thread__top">
+                      <div class="thread__author">
+                        <a href="{% url 'user-profile' message.author.id %}" class="thread__authorInfo">
+                          <div class="avatar avatar--small">
+                            <img src="{{message.author.avatar.url}}" />
+                          </div>
+                          <span>@{{message.author.username}}</span>
+                        </a>
+                        <span class="thread__date">{{message.created|timesince}} ago</span>
+                      </div>
+                    </div>
+                    {% endifchanged %}
+                    <div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">
+                      {{message.body}}
+                    </div>
+                  {% endifchanged %}
+                {% endfor %}
+  
+              </div>
+            </div>
+          </div>
+          
+          {% if request.user.is_authenticated %}
+          <div class="room__message">
+            
+            <form method = "POST" id = 'post-form'>
+              {% csrf_token %}
+              <input type = 'text' id = "form-body" name="body" placeholder="Write your message here..." autofocus />
+            </form>
+          </div>
+          {% endif %}
+        </div>  
+      </div>
+    </main>
+{% endblock content %}
+

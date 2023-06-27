@@ -17,7 +17,8 @@ class RoomForm(ModelForm):
         exclude = ['host','participants']
 
 class ForgetPasswordForm(forms.Form):
-    email = forms.EmailField(required=True) 
+    email = forms.EmailField(required=True,
+        widget=forms.EmailInput(attrs={'class':'form-control form-control-lg'})) 
 
     def clean(self):
         cleaned_data = super().clean()

@@ -87,7 +87,8 @@
             
         </div>
 
-          <div style = "border-bottom: 1px solid var(--color-light-gray); margin-bottom: 5px ;"><div>Friends</div>
+          <div style = "border-bottom: 1px solid var(--color-light-gray); margin-bottom: 5px ;">
+            <div>Friends</div>
           {% if friends %}
             {% for friend in friends %}
               {% if friend != request.user %}
@@ -167,9 +168,9 @@
     {% for message in room_messages %}
     <div class="activities__box">
       <div class="activities__boxHeader roomListRoom__header">
-        <a href="{% url 'user-profile' message.user.id %}" class="roomListRoom__author">
+        <a href="{% url 'user-profile' message.author.id %}" class="roomListRoom__author">
           <div class="avatar avatar--small">
-            <img src="{{message.user.avatar.url}}" />
+            <img src="{{message.author.avatar.url}}" />
           </div>
           <p>
             @{{message.user.username}}

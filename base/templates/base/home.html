@@ -1,66 +1,253 @@
-<style>
-  .feed_content{
-    height: 600px;
-  }
-</style>
-
 {% extends 'main.html' %}
 
 {% block content %}
-
-    <main class= "layout layout--3">
-      <div class="container">
-        <!-- Topics Start -->
-        {% include 'base/topics_component.html' %}
-        
-        <!-- Topics End -->
+<style>
+ 
 
 
-        <!-- Room List Start -->
-        <div class="roomList">
-          <div class="mobile-menu">
-            <form class="header__search">
-              <label>
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-                  <title>search</title>
-                  <path
-                    d="M32 30.586l-10.845-10.845c1.771-2.092 2.845-4.791 2.845-7.741 0-6.617-5.383-12-12-12s-12 5.383-12 12c0 6.617 5.383 12 12 12 2.949 0 5.649-1.074 7.741-2.845l10.845 10.845 1.414-1.414zM12 22c-5.514 0-10-4.486-10-10s4.486-10 10-10c5.514 0 10 4.486 10 10s-4.486 10-10 10z"
-                  ></path>
-                </svg>
-                <input placeholder="Search for posts" />
-              </label>
-            </form>
-            <div class="mobile-menuItems">
-              <a class="btn btn--main btn--pill" href="#">Browse Topics</a>
-              <a class="btn btn--main btn--pill" href="#">Recent Activities</a>
-            </div>
+
+</style>
+<main>
+  <div class="container py-5" style="height: 90vh;">
+      <div class="row d-flex justify-content-center align-items-start h-100">
+          <div class="col-3">
+            <div class="card mb-5 p-0 bg-dark" style="border: none; width: 100%;">
+              <div class="card-body p-3 mb-0 bg-dark rounded " style="color: #b6aeb6;">
+                  <h5 class = "m-0">Browse Topics</h5>
+              </div>
+              <div class="card-body mt-1 px-1 py-0 rounded-bottom " style=" 
+              background-color: #6D5D6E; display: flex; flex-direction: column; align-items: start;">
+                <a href="{% url 'home' %}" class="my-2 fw-bold text-dark bg-transparent" 
+                style=" text-decoration: none; padding-left: 15px; ">All
+                <span class="fw-bold badge-primary badge-pill text-dark" style="padding-left: 5px;">({{topics.count}})</span></a>
+                {% for topic in topics %}
+                  {% if topic.room_set.all.count == 0 %}
+                  {% else %}
+                    <div class="my-2 d-flex" style="padding-left: 15px;">
+                        <a href="{% url 'home' %}?k={{topic.name}}" class="fw-bold text-dark bg-transparent" style="padding-right: 5px;
+                        text-decoration: none; ">{{topic.name}}</a>
+                          <span class="fw-bold badge-primary badge-pill text-dark">({{topic.room_set.all.count}})</span></a>  
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
           </div>
-          <div class="roomList__header">
+        </div>
+        <div class="col-6">
+          <div class="d-flex justify-content-between align-items-center mb-5" style="width: 100%;">
             <div>
-              <h2>Study Room</h2>
-              <p>{{room_count}} Rooms available</p>
+              <h5 class="my-1">ROOMS</h5>
+              <h6 class="mb-0" style="color: #b6aeb6;">{{room_count}} Rooms available</h6>
             </div>
-            <a class="btn btn--main" href="{% url 'create-room' %}">
-              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-                <title>add</title>
-                <path
-                  d="M16.943 0.943h-1.885v14.115h-14.115v1.885h14.115v14.115h1.885v-14.115h14.115v-1.885h-14.115v-14.115z"
-                ></path>
-              </svg>
-              Create Room
-            </a>
+            <a href="{% url 'create-room' %}" class=" fw-bold btn p-2" style="width: 140px; background-color: #6D5D6E;"> Create Room</a>
+          </div>  
+          <h6 style="color:#b6aeb6 ;">All Rooms</h6>
+          {% for room in test %} 
+          <div class="card bg-dark text-white mb-3 rounded" style="width: 100%; height: 200px;">
+              <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between;">
+                  <div class="d-flex justify-content-between" style="width: 100%;">
+                      <a href="{% url 'user-profile' room.host.id %}" class="d-flex" style="text-decoration: none; color: #6D5D6E;">
+                      <div class="avatar avatar--small" style="padding-right: 8px;" >
+                        <img src="{{room.host.avatar.url}}" style=" border: 3px solid #b6aeb6;" />
+                      </div>
+                      <span>@{{room.host.username}}</span>
+                      </a>
+                      <span style="color: #b6aeb6;">{{room.created|timesince}} ago</span>
+                  </div>
+                  
+                  <h5><a href="{% url 'room' room.id %}" class="card-title py-3" style="color: #b6aeb6; text-decoration: none;">{{room.name}}</a></h5>
+                  
+                  <div class="d-flex justify-content-between pt-2" style="border-top: 1px solid #6D5D6E; color: #6D5D6E;">
+                      <div>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                              <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+                            </svg>
+                            {{room.participants.all.count}} Joined
+                      </div>
+                      <p class="my-0 rounded text-dark fw-bold" style="width: 80px; text-align: center; background-color: #6D5D6E;">{{room.topic.name}}</p>
+                  </div>
+              </div>
           </div>
-        
-          {% include 'base/feed_component.html' %}
+            {% endfor %}
+            <div class = "pagination w-100  d-flex justify-content-center">
+              <a class="bg-dark mx-2" href = "?page=1"><<</a> 
+              {% if test.has_previous %}
+              <a class="bg-dark mx-2" href = "?page={{test.previous_page_number}}"><</a>
+              {% else %}
+              <a class="bg-dark mx-2" href = "?page=1"><</a> 
+              {% endif %}
+                
+              <a class = "active text-dark mx-2">{{test.number}}</a>
+            
+              {% if test.has_next %}
+              <a class="bg-dark mx-2" href = "?page={{test.next_page_number}}">></a> 
+              {% else %}
+              <a class="bg-dark mx-2" href = "?page={{test.paginator.num_pages}} ">></a>
+              {% endif %}
+              <a class="bg-dark mx-2" href = "?page={{test.paginator.num_pages}} ">>></a>
+            </div>
+        </div>
+          <div class="col-3">
+              {% if user.is_authenticated %}
+              <div class="card mb-3 p-0 bg-dark" style="border: none; width: 100%;">
+                  <div class="card-body p-3 mb-0 bg-dark rounded " style="color: #b6aeb6;">
+                      <h5 class = "m-0">Friend List</h5>
+                  </div>
+                  <div class="scroll test card-body mt-1 px-1 py-0 rounded-bottom " style=" height: 250px; 
+                  background-color: #6D5D6E; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div class="col">
+                        <div style="border-bottom: 1px solid #393646;">
+                          <h6 class="my-2 px-2">Friend requests</h6> 
+                            {% if fr_req %}
+                              {% for request1 in fr_req %}
+                              <div class="row py-2 px-2">
+                                  <div class="d-flex justify-content-between">
+                                      <a href="{% url 'user-profile' request1.from_user.id %}" class="d-flex align-items-center" style="text-decoration: none; color: #6D5D6E;">
+                                        <div class="avatar avatar--medium" style="padding-right: 8px;" >
+                                          <img src="{{request1.from_user.avatar.url}}" style=" border: 3px solid #393646;"/>
+                                        </div>
+                                        <div class="col">
+                                          <div class = "text-dark fw-bold ">
+                                          {{request1.from_user.name}}
+                                          </div>
+                                          <div class="text-dark fw-bold" >@{{request1.from_user.username}}</div>
+                                        </div>
+                                      </a>
+                                      <div style = "display:flex; width: 40%;align-self: center;justify-content: space-evenly;">
+                                        <a href = "/accept_friend_request/{{request1.id}}"><i class="fa-solid fa-check"></i></a>
+                                        <a href = "/decline_friend_request/{{request1.id}}"><i class="fa-solid fa-xmark"></i></a>
+                                      </div>
+                                  </div>
+                              </div>   
+                              {% endfor %}
+                            {% else %}
+                              <div style = "text-align: center; color: #b6aeb6">No friend requests</div>
+                            {% endif %}
+                          </div>
+                          <div style="border-bottom: 1px solid #393646;">
+                            <h6 class="my-2 px-2">Friends</h6>
+                            {% if friends %}
+                              {% for friend in friends %}
+                                {% if friend != request.user %}
+                                  <div class="row py-2 px-2">
+                                      <div class="d-flex justify-content-between align-items-center">
+                                          <a href="{% url 'user-profile' friend.id %}" class="d-flex align-items-center" style="text-decoration: none; color: #6D5D6E;">
+                                            <div class="avatar avatar--medium" style="padding-right: 8px;" >
+                                              <img src="{{friend.avatar.url}}" style=" border: 3px solid #393646; "/>
+                                            </div>
+                                            <div class="col">
+                                              <div class = "text-dark fw-bold ">
+                                              {{friend.name}}
+                                              </div>
+                                              <div class="fw-bold" style="color: #b6aeb6">@{{friend.username}}</div>
+                                            </div>
+                                          </a>
+                                          <a href = "/chat/{{friend.id}}" style="color: #b6aeb6; padding-right: 25px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chat-fill" viewBox="0 0 16 16">
+                                              <path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z"/>
+                                            </svg>
+                                          </a>
+                                      </div>
+                                  </div>
+                                {% endif %}
+                              {% endfor %}
+                            {% else %}
+                              <div style = "text-align: center; color: #b6aeb6">No friend requests</div>
+                            {% endif %}
+                          </div>
+                          <div>
+                            <h6 class="my-2 px-2">Find friends</h6>
+                            {% for user in users %}
+                              {% if user != request.user and user.id in from_user %}
+
+                              {% elif user != request.user and user not in friends %}
+                                <div class="row py-2 px-2">
+                                  <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'user-profile'  user.id %}" class="d-flex align-items-center" style="text-decoration: none; color: #6D5D6E;">
+                                      <div class="avatar avatar--medium" style="padding-right: 8px;" >
+                                        <img src="{{user.avatar.url}}" style=" border: 3px solid #393646;"/>
+                                      </div>
+                                      <div class="col">
+                                        <div class = "text-dark fw-bold ">
+                                        {{user.name}}
+                                        </div>
+                                        <div class=" fw-bold" style="color: #b6aeb6">@{{user.username}}</div>
+                                      </div>
+                                    </a>
+                                    {% if user.id in to_user %}
+                                      <a class="fw-bold btn p-1" style="cursor: default; height: 40px; width: 80px; background-color: #393646; color: #b6aeb6;">Sent</a>
+                                    {% else %}
+                                      <a href = "/send_friend_request/{{user.id}}" class="fw-bold btn p-2" style="height: 40px; width: 80px; background-color: #393646; color: #b6aeb6;">Add friend</a>
+                                    {% endif %}
+                                  </div>
+                                </div>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                      </div> 
+                  </div>
+              </div>
+              {% else %}
+              <div class="card mb-3 p-0 bg-dark" style="border: none; width: 100%;">
+                  <div class="card-body p-3 mb-0 bg-dark rounded " style="color: #b6aeb6;">
+                      <h5 class = "m-0">Find your partner</h5>
+                  </div>
+                  <div class="scroll test card-body mt-1 px-1 py-0 rounded-bottom " style=" height: 250px; 
+                  background-color: #6D5D6E; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div class="col">
+                          {% for user in users %}
+                          <div class="row py-2 px-4">
+                              <div>
+                                  <a href="{% url 'user-profile' user.id %}" class="d-flex align-items-center" style="text-decoration: none; color: #6D5D6E;">
+                                  <div class="avatar avatar--medium" style="padding-right: 8px;" >
+                                    <img src="{{user.avatar.url}}" />
+                                  </div>
+                                  <div class="col">
+                                    <div class = "text-dark fw-bold ">
+                                    {{user.name}}
+                                    </div>
+                                    <div class="text-dark fw-bold" >@{{user.username}}</div>
+                                  </div>
+                                  </a>
+                              </div>
+                          </div>
+                            
+                          {% endfor %}
+                      </div> 
+                  </div>
+              </div>
+            {% endif %}
+            <div class="card mb-5 p-0 bg-dark" style="border: none; width: 100%;">
+              <div class="card-body p-3 mb-0 bg-dark rounded " style="color: #b6aeb6;">
+                  <h5 class = "m-0">Recent Activities</h5>
+              </div>
+              <div class="card-body mt-1 px-1 py-0 rounded-bottom " style=" 
+              background-color: #6D5D6E; display: flex; flex-direction: column; align-items: center;">
+                      {% for message in room_messages %}
+                      <div class="row my-2 py-2 px-6 rounded border w-75" style="border: 1px solid #b6aeb6;">
+                          <div>
+                              <a href="{% url 'user-profile' message.author.id %}" class="d-flex align-items-center" style="text-decoration: none; color: #b6aeb6;">
+                              <div class="avatar avatar--small" style="padding-right: 8px;" >
+                                <img src="{{message.author.avatar.url}}" style=" border: 3px solid #393646;"/>
+                              </div>
+                              <div class="col">
+                                <div class="text-dark fw-bold" >@{{message.author.username}}</div>
+                                <div>{{message.created|timesince}}</div>
+                              </div>
+                              </a>
+                          </div>
+                          <div class="activities__boxContent">
+                            <p>replied to post “<a style="color: #b6aeb6; text-decoration: none;" href="{% url 'room' message.room.id %}">{{message.room}}</a>”</p>
+                            <div class="p-2 rounded" style="background-color: #393646; color: #b6aeb6;">
+                             {{message.body}}
+                            </div>
+                          </div>
+                      </div> 
+                  {% endfor %}
+              </div>
+          </div>
 
         </div>
-        <!-- Room List End -->
-
-        <!-- Activities Start -->
-        {% include 'base/activity_component.html' %}
-        
-        <!-- Activities End --> 
-      </div>
-    </main>
-
+  </div>
+</main>
 {% endblock content %}

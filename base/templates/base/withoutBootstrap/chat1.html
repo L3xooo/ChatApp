@@ -1,0 +1,333 @@
+{% include 'main.html' %}
+
+{% block content %}
+<style>
+.layout--2 > .container > div:first-child {
+  flex-basis: 25%;
+}
+
+.layout--2 > .container > div:last-child {
+  flex-basis: 72%;
+}
+
+.thread {
+  margin: 2rem 0;
+}
+
+.threads {
+  background: var(--color-bg);
+  border-radius: 0.7rem;
+  overflow-y: auto;
+  height: 100%;
+  margin-top: 1vh;
+  padding: 4rem 2rem 4rem 2rem;
+}
+
+.room__conversation {
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  height: 90%;
+}
+
+.participant{
+    position: relative;
+    padding: 5px 5px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+}
+
+.participants__list {
+  padding:0rem;
+
+}
+.room__topLeft h3{
+    margin: auto;
+}
+
+.thread__details {
+  font-size: 1.4rem;
+}
+/* .thread__details:hover {
+  background-color: #22222b;
+} */
+
+.line{
+  width: 300px;
+  background-color: var(--color-dark);
+  height: 1px;
+  align-self: center;
+}
+.date-separator{
+  color: var(--color-dark);
+  display: flex;
+  align-self: center;
+  justify-content: center;
+}
+
+.participant .test{
+  display: flex;
+  width: 100%;
+  gap: 1.5rem;
+}
+
+.participant:hover{
+  transition: 0.5s;
+  background-color: #5c5d70;
+}
+
+.participant i{
+  visibility: hidden;
+}
+
+.participant:hover i{ 
+  visibility: visible;
+}
+
+.participant:hover .notification{
+  visibility: hidden;
+}
+.participants__list{
+  overflow: hidden;
+}
+
+.participants__list:hover{
+  overflow-y: scroll;
+}
+.xmark{
+  cursor: pointer;
+  position: absolute; 
+  z-index: 1500;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.active{
+  background-color: #525364;
+}
+
+.xmark:hover{
+  color: var(--color-main-light);
+}
+.notification{
+  background-color: rgb(222,48,48);
+  font-weight: 700;
+  position: absolute;
+  z-index: 1500;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  color: white;
+}
+
+.class{
+  color: blue;
+}
+</style>
+
+
+
+<main class="profile-page layout layout--2">
+    <div class="container">
+      <!-- Friends List -->
+      <div class="participants">
+        <h3 class="participants__top">Chats<span>({{participants.count}} Joined)</span></h3>
+        <div class="participants__list scroll" id = "TEST">
+          {% for friend,test in foo %}
+          <div class="participant {% if friend.id == to_user.id %} active {% endif %}">
+            <a href="{% url 'chat' friend.id %}" class = "test">
+              <div class="avatar avatar--medium">
+                <img src="{{friend.avatar.url}}" />
+              </div>
+              <p>
+                {{friend.name}}
+                <span>@{{friend.username}}</span>
+              </p>
+              {% if test == 0 %}
+              {% else %}
+              <div class = "notification">{{test}}</div>
+              {% endif %}
+                <a href =  "/delete_from_chat/{{friend.id}}" class = "xmark"><i class="fa-solid fa-xmark fa-lg"></i></a>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- Room Start -->
+      
+      <div class="room">
+        <div class="room__top">
+          <div class="room__topLeft">
+            <a href = "{% url 'user-profile' to_user.id %}" class="avatar avatar--medium">
+                <img src="{{to_user.avatar.url}}"/>
+            </a>
+            <h3>{{to_user.name}}</h3>
+          </div>
+        </div>
+  
+        <div class="room__box scroll">
+          <div class="room__conversation">
+            <div id = "body" class="threads scroll" >
+              {% for message in chat_messages %}
+                {% ifchanged message.created.date %}
+                <div class = "date-separator"><div class = "line"></div>{{message.created.date}}<div class = "line"></div></div>
+                {% endifchanged %}
+                {{datetime.now}}
+                {% ifchanged message.author.username %}
+                  <div class="thread__top">
+                    <div class="thread__author">
+                      <a href="{% url 'user-profile' message.author.id %}" class="thread__authorInfo">
+                        <div class="avatar avatar--small">
+                          <img src="{{message.author.avatar.url}}" />
+                        </div>
+                        <span>@{{message.author.username}}</span>
+                      </a>
+                      <span class="thread__date">{{message.created|timesince}} ago</span>
+                    </div>
+                  </div>
+                 <div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">
+                    {{message.body}}
+                  </div> 
+                {% else %}
+                  {% ifchanged message.created.date %}
+                    <div class="thread__top">
+                    <div class="thread__author">
+                      <a href="{% url 'user-profile' message.author.id %}" class="thread__authorInfo">
+                        <div class="avatar avatar--small">
+                          <img src="{{message.author.avatar.url}}" />
+                        </div>
+                        <span>@{{message.author.username}}</span>
+                      </a>
+                      <span class="thread__date">{{message.created|timesince}} ago</span>
+                    </div>
+                  </div>
+                  {% endifchanged %}
+                  <div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">
+                    {{message.body}}
+                  </div>
+                {% endifchanged %}
+              {% endfor %}
+
+            </div>
+          </div>
+        </div>
+        
+        {% if request.user.is_authenticated %}
+        <div class="room__message">
+          
+          <form method = "POST" id = 'post-form'>
+            {% csrf_token %}
+            <input type = 'text' id = "form-body" name="body" placeholder="Write your message here..." autofocus />
+          </form>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+</main>
+
+<script>
+  var e = document.getElementById('body');
+  e.scrollTop = e.scrollHeight;
+</script>
+
+<script>
+var count = "{{message_count}}";
+function refresh() {
+    $.ajax({
+        type: "GET",
+        url: '{% url "receive_message" to_user.id %}',
+        success: function(data){
+            console.log(data.length);
+            if(data.length == count){
+              console.log("No new message");
+              console.log(data[count-1]);
+            }
+            else{
+              var last_message = data[count];
+              console.log("New message");
+              console.log(last_message);
+              count++;
+              var temp =
+                '<div class="thread__top">'+
+                    '<div class="thread__author">'+  
+                      '<a href = {% url "user-profile" to_user.id %} class="thread__authorInfo">'+  
+                        '<div class="avatar avatar--small">'+
+                          '<img src="{{to_user.avatar.url}}"/>'+
+                        '</div>'+
+                        '<span>'+'@'+"{{to_user.username}}"+'</span>'+
+                      '</a>'+
+                      //'<span class="thread__date">'+response.messages[key].created+'</span>'+
+                    '</div>'+
+                  '</div>'+
+                '<div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">'+
+                    last_message+
+                ' </div>';
+            $("#body").append(temp);
+            var e = document.getElementById('body');
+            e.scrollTop = e.scrollHeight;
+            }
+        }
+    });
+}
+$(function(){
+    setInterval(refresh, 10000);
+});
+
+
+$(document).on('submit','#post-form',function(e){
+  e.preventDefault();
+  console.log("Create chat message is working")
+  console.log("{{to_user.id}}")
+  $.ajax({
+    type:"POST",
+    url: "{% url 'create' to_user.id %}",
+    data: {
+      body:$("#form-body").val(),
+      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+  },
+  success:function(data){
+    //alert("Data succcefully updated")
+    console.log(data);
+    var lastMessageAuthor = data.last;
+    if (lastMessageAuthor == "{{user.email}}"){
+      console.log("Working");
+    }
+    console.log(lastMessageAuthor);
+    var temp =
+                '<div class="thread__top">'+
+                    '<div class="thread__author">'+  
+                      '<a href = {% url "user-profile" user.id %} class="thread__authorInfo">'+  
+                        '<div class="avatar avatar--small">'+
+                          '<img src="{{user.avatar.url}}"/>'+
+                        '</div>'+
+                        '<span>'+'@'+"{{user.username}}"+'</span>'+
+                      '</a>'+
+                      //'<span class="thread__date">'+response.messages[key].created+'</span>'+
+                    '</div>'+
+                  '</div>'+
+                '<div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">'+
+                    data.body+
+                ' </div>';
+    $("#body").append(temp);
+
+
+    const firstNameInput = document.getElementById('form-body');
+    firstNameInput.value = '';
+    var e = document.getElementById('body');
+    e.scrollTop = e.scrollHeight;
+  },
+  error:function(response){
+          alert("an error");
+      }
+    });
+  });
+
+
+
+</script>
+
+{% endblock content %}

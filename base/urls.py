@@ -1,7 +1,4 @@
-from gc import unfreeze
-
 from django.urls import path
-
 from . import views
 
 urlpatterns = [
@@ -30,14 +27,17 @@ urlpatterns = [
     path('profile/<str:pk>/friends',views.friends_view,name = 'friends'),
     path('unfriend/<str:pk>',views.unfriend,name = 'unfriend'),
 
-    path('chat/<str:pk>',views.chat_view,name = 'chat'),
-    path('delete_from_chat/<str:pk>/',views.delete_from_chat,name = 'delete-from-chat'),
 
-    path('test',views.test,name = "test"),
 
-    path('test1/<str:pk>',views.test1,name = "test1"),
+    #Room
+    path('room/<str:pk>/create',views.createRoomMessage,name = "createRoomMessage"),
+    path('room/<str:pk>/receive_message',views.receive_room_message,name = "receive_room_message"),
 
+
+    #Chat
     path('create/<str:pk>',views.create,name = "create"),
     path('receive_message/<str:pk>',views.receive_chat_message,name = "receive_message"),
+    path('chat/<str:pk>',views.chat_view,name = 'chat'),
+    path('delete_from_chat/<str:pk>/',views.delete_from_chat,name = 'delete-from-chat'),
     ]
 

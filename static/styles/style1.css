@@ -1,0 +1,151 @@
+*{
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+}
+
+
+.list-group ul{
+    padding:none;;
+}
+.list-group ul li{
+    list-style: none;
+    padding-bottom: 10px;
+    text-align: center;
+    margin-block-start: 0;
+}
+.list-group a{
+    color: #6D5D6E;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+}
+.list-group span{
+    color: #6D5D6E;
+    font-size: 20px;
+}
+
+.avatar {
+    position: relative;
+    display: inline-block;
+    border-radius: 50%;
+    border: 2px solid var(--color-main);
+}
+
+.avatar img {
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.avatar::after {
+    content: "";
+    display: block;
+    position: absolute;
+    background-color: var(--color-gray);
+    z-index: 111;
+    border-radius: 50%;
+    border: 0.3rem solid var(--color-dark);
+}
+
+.avatar.active::after {
+    background-color: var(--color-success);
+}
+
+.avatar.avatar--small img {
+    width: 2rem;
+    height: 2rem;
+}
+
+.avatar.avatar--small:after {
+    width: 0.7rem;
+    height: 0.7rem;
+    bottom: 0px;
+    right: -6px;
+}
+
+.avatar.avatar--medium img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+}
+
+.avatar.avatar--medium:after {
+    width: 0.7rem;
+    height: 0.7rem;
+    bottom: 0px;
+    right: -6px;
+}
+
+.avatar.avatar--large img {
+    display: block;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+}
+
+.avatar.avatar--large:after {
+    width: 1rem;
+    height: 1rem;
+    bottom: 2px;
+    right: 3.5px;
+}
+.pagination{
+    text-align: center;
+}
+.pagination a{
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    color: #b6aeb6;
+    text-decoration: none;
+}
+
+.pagination a:hover{
+    color: #b6aeb6;
+}
+.pagination a.active{
+    justify-self: center;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    background-color: #b6aeb6;
+}
+
+.test{
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.friend:hover{
+    background-color: #b6aeb6;
+}
+
+a.delete svg{
+    display: none;
+}
+
+.friend:hover a.delete svg{
+    display: block;
+}
+.friend:hover a.delete:hover{
+    color: #6D5D6E;
+}
+
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #b6aeb6;
+    font-size: medium;
+    opacity: 1; /* Firefox */
+    padding-left: 5px;
+}
+
+.line{
+    width: 300px;
+    background-color: #6D5D6E;
+    height: 1px;
+    align-self: center;
+}
+.date-separator{
+    display: flex;
+    align-self: center;
+    justify-content: center;
+}

@@ -1,286 +1,227 @@
-{% include 'main.html' %}
+{% extends 'main.html' %}
 
 {% block content %}
 <style>
-.layout--2 > .container > div:first-child {
-  flex-basis: 25%;
+.friend:hover{
+  background-color: #b6aeb6;
 }
 
-.layout--2 > .container > div:last-child {
-  flex-basis: 72%;
+a.delete svg{
+  display: none;
 }
 
-.thread {
-  margin: 2rem 0;
+.friend:hover a.delete svg{
+  display: block;
+}
+.friend:hover a.delete:hover{
+  color: #6D5D6E;
 }
 
-.threads {
-  background: var(--color-bg);
-  border-radius: 0.7rem;
-  overflow-y: auto;
-  height: 100%;
-  margin-top: 1vh;
-  padding: 4rem 2rem 4rem 2rem;
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #b6aeb6;
+  font-size: medium;
+  opacity: 1; /* Firefox */
+  padding-left: 5px;
 }
-
-.room__conversation {
-  margin-top: 0rem;
-  margin-bottom: 0rem;
-  height: 90%;
-}
-
-.participant{
-    position: relative;
-    padding: 5px 5px;
-    margin-bottom: 2px;
-    border-radius: 5px;
-}
-
-.participants__list {
-  padding:0rem;
-
-}
-.room__topLeft h3{
-    margin: auto;
-}
-
-.thread__details {
-  font-size: 1.4rem;
-}
-/* .thread__details:hover {
-  background-color: #22222b;
-} */
 
 .line{
   width: 300px;
-  background-color: var(--color-dark);
+  background-color: #6D5D6E;
   height: 1px;
   align-self: center;
 }
 .date-separator{
-  color: var(--color-dark);
   display: flex;
   align-self: center;
   justify-content: center;
 }
 
-.participant .test{
-  display: flex;
-  width: 100%;
-  gap: 1.5rem;
-}
-
-.participant:hover{
-  transition: 0.5s;
-  background-color: #5c5d70;
-}
-
-.participant i{
-  visibility: hidden;
-}
-
-.participant:hover i{ 
-  visibility: visible;
-}
-
-.participant:hover .notification{
-  visibility: hidden;
-}
-.participants__list{
-  overflow: hidden;
-}
-
-.participants__list:hover{
-  overflow-y: scroll;
-}
-.xmark{
-  cursor: pointer;
-  position: absolute; 
-  z-index: 1500;
-  right: 25px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.active{
-  background-color: #525364;
-}
-
-.xmark:hover{
-  color: var(--color-main-light);
-}
-.notification{
-  background-color: rgb(222,48,48);
-  font-weight: 700;
-  position: absolute;
-  z-index: 1500;
-  right: 25px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  text-align: center;
-  color: white;
-}
-
-.class{
-  color: blue;
-}
 </style>
-
-
-
-<main class="profile-page layout layout--2">
-    <div class="container">
-      <!-- Friends List -->
-      <div class="participants">
-        <h3 class="participants__top">Chats<span>({{participants.count}} Joined)</span></h3>
-        <div class="participants__list scroll" id = "TEST">
-          {% for friend,test in foo %}
-          <div class="participant {% if friend.id == to_user.id %} active {% endif %}">
-            <a href="{% url 'chat' friend.id %}" class = "test">
-              <div class="avatar avatar--medium">
-                <img src="{{friend.avatar.url}}" />
-              </div>
-              <p>
-                {{friend.name}}
-                <span>@{{friend.username}}</span>
-              </p>
-              {% if test == 0 %}
-              {% else %}
-              <div class = "notification">{{test}}</div>
-              {% endif %}
-                <a href =  "/delete_from_chat/{{friend.id}}" class = "xmark"><i class="fa-solid fa-xmark fa-lg"></i></a>
-            </a>
+<main>
+  <div class="container py-5" style="height: 90vh;">
+    <div class="row d-flex justify-content-center align-items-start h-100">
+      <div class="col-3">
+        <div class="card mb-3 p-0 bg-dark" style="border: none; width: 100%;">
+          <div class="card-body p-3 mb-0 bg-dark rounded " style="color: #b6aeb6; height: 60px;">
+              <h5 class = "m-0">Friend List</h5>
           </div>
-          {% endfor %}
-        </div>
-      </div>
-      <!-- Room Start -->
-      
-      <div class="room">
-        <div class="room__top">
-          <div class="room__topLeft">
-            <a href = "{% url 'user-profile' to_user.id %}" class="avatar avatar--medium">
-                <img src="{{to_user.avatar.url}}"/>
-            </a>
-            <h3>{{to_user.name}}</h3>
-          </div>
-        </div>
-  
-        <div class="room__box scroll">
-          <div class="room__conversation">
-            <div id = "body" class="threads scroll" >
-              {% for message in chat_messages %}
-                {% ifchanged message.created.date %}
-                <div class = "date-separator"><div class = "line"></div>{{message.created.date}}<div class = "line"></div></div>
-                {% endifchanged %}
-                {{datetime.now}}
-                {% ifchanged message.author.username %}
-                  <div class="thread__top">
-                    <div class="thread__author">
-                      <a href="{% url 'user-profile' message.author.id %}" class="thread__authorInfo">
-                        <div class="avatar avatar--small">
-                          <img src="{{message.author.avatar.url}}" />
+          <div class="scroll test card-body mt-1 px-1 py-0 rounded-bottom " style=" height: 700px; 
+          background-color: #6D5D6E; display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="col">
+              {% for friend,test in foo %}
+              <div class="friend row px-2">
+                  <div class="d-flex justify-content-between">
+                      <a href="{% url 'chat' friend.id %}" class="py-2 d-flex align-items-center w-100" style="text-decoration: none; color: #6D5D6E;">
+                        <div class="avatar avatar--medium" style="padding-right: 8px;" >
+                          <img src="{{friend.avatar.url}}" style=" border: 3px solid #393646;"/>
                         </div>
-                        <span>@{{message.author.username}}</span>
-                      </a>
-                      <span class="thread__date">{{message.created|timesince}} ago</span>
-                    </div>
-                  </div>
-                 <div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">
-                    {{message.body}}
-                  </div> 
-                {% else %}
-                  {% ifchanged message.created.date %}
-                    <div class="thread__top">
-                    <div class="thread__author">
-                      <a href="{% url 'user-profile' message.author.id %}" class="thread__authorInfo">
-                        <div class="avatar avatar--small">
-                          <img src="{{message.author.avatar.url}}" />
+                        <div class="col">
+                          <div class = "text-dark fw-bold ">
+                          {{friend.name}}
+                          </div>
+                          <div class="text-dark fw-bold" >@{{friend.username}}</div>
                         </div>
-                        <span>@{{message.author.username}}</span>
+                        {% if test == 0 %}
+                        {% else %}
+                          <div class = "notification">{{test}}</div>
+                        {% endif %}
+                        <a href =  "/delete_from_chat/{{friend.id}}" class="text-dark d-flex align-items-center delete" style="margin-right: 20px;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                          </svg>
+                        </a>
                       </a>
-                      <span class="thread__date">{{message.created|timesince}} ago</span>
-                    </div>
                   </div>
-                  {% endifchanged %}
-                  <div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">
-                    {{message.body}}
-                  </div>
-                {% endifchanged %}
+              </div>   
               {% endfor %}
-
             </div>
           </div>
         </div>
-        {% if request.user.is_authenticated %}
-        <div class="room__message">
-          
-          <form method = "POST" id = 'post-form'>
-            {% csrf_token %}
-            <input type = 'text' id = "form-body" name="body" placeholder="Write your message here..." autofocus />
-          </form>
+      </div>
+
+      <div class="col-9">
+        <div class="card mb-3 p-0 bg-dark" style="border: none; width: 100%;">
+          <div class="card-body p-3 mb-0 bg-dark rounded " style="color: #b6aeb6; height: 60px;">
+            <a href="{% url 'user-profile' to_user.id %}" class=" d-flex align-items-center w-100" style="text-decoration: none; color: #6D5D6E;">
+              <div class="avatar avatar--medium" style="padding-right: 8px;" >
+                <img src="{{to_user.avatar.url}}" style=" border: 3px solid #b6aeb6;" />
+              </div>
+              <h5 style="color: #b6aeb6;" class = "m-0">{{to_user.name}}</h5>
+            </a> 
+          </div>
+          <div class=" card-body mt-1 px-1 py-0 rounded-bottom " style=" height: 700px; 
+          background-color: #6D5D6E; display: flex; flex-direction: column; justify-content: space-between;">
+            <div id = "body" class=" scroll test card-body mx-2 mt-2  pb-2 rounded " style="margin-bottom: 10px; background-color: #393646; color: #b6aeb6; height: 60px;">
+              {% for message in chat_messages %}
+              {% ifchanged message.created.date %}
+              <div class = "date-separator">
+                <div class = "line"></div>
+                  <div style="padding: 0 25px;">{{message.created.date}}</div>
+                <div class = "line"></div>
+              </div>
+              {% endifchanged %}
+              {{datetime.now}}
+              {% ifchanged message.author.username %}
+                <div class="d-flex align-items-center">
+                  <a href="{% url 'user-profile' message.author.id %}" class=" d-flex align-items-center" style=" text-decoration: none; color: #6D5D6E;">
+                    <div class="avatar avatar--small" style="padding-right: 8px;" >
+                      <img src="{{message.author.avatar.url}}" style=" border: 3px solid #b6aeb6;" />
+                    </div>
+                    <div class="col">
+                      <div class = " fw-bold " style="color: #b6aeb6;"> 
+                        @{{message.author.username}}
+                      </div>
+                    </div>
+                  </a>
+                  <div class="px-3">{{message.created}}</div>
+                </div>
+                <div style="padding-left: 40px;">{{message.body}}</div>
+              {% else %}
+                {% ifchanged message.created.date or message.created.minute  %}
+                <div class="d-flex align-items-center">
+                  <a href="{% url 'user-profile' message.author.id %}" class=" d-flex align-items-center" style=" text-decoration: none; color: #6D5D6E;">
+                    <div class="avatar avatar--small" style="padding-right: 8px;" >
+                      <img src="{{message.author.avatar.url}}" style=" border: 3px solid #b6aeb6;" />
+                    </div>
+                    <div class="col">
+                      <div class = " fw-bold " style="color: #b6aeb6;"> 
+                        @{{message.author.username}}
+                      </div>
+                    </div>
+                  </a>
+                  <div class="px-3">{{message.created}}</div>
+                </div>
+                {% endifchanged %}
+                <div style="padding-left: 40px;">{{message.body}}</div>
+              {% endifchanged %}  
+              {% endfor %}
+            </div>
+            {% if request.user.is_authenticated %}
+            <form method = "POST" id = 'post-form'>
+              {% csrf_token %}
+              <div class="form-outline form-white mb-4 d-flex justify-content-around align-items-center">
+                <input type="text" name = "body" id="form-body" placeholder="Write your message here"
+                class="form-control form-control-lg p-0 mx-2 text-white" style=" border: none; background-color: #393646;" />
+              </div>
+            </form>
+            {% endif %}
+          </div>
         </div>
-        {% endif %}
       </div>
 
     </div>
+  </div>
 </main>
-
 <script>
   var e = document.getElementById('body');
   e.scrollTop = e.scrollHeight;
 </script>
 
 <script>
-var count = "{{message_count}}";
+var count = parseInt("{{message_count}}");
+
 function refresh() {
+  var counter = 0;
     $.ajax({
         type: "GET",
         url: '{% url "receive_message" to_user.id %}',
+        data : {message : count},
         success: function(data){
-            console.log(data.length);
-            if(data.length == count){
-              console.log("No new message");
-              console.log(data[count-1]);
+          var message_array = data.message_array;
+          var lastMessageAuthor = data.lastMessageAuthor;
+          var timeDiff = data.timeDiff;
+          message_array.forEach(element => {
+            counter = counter + 1;
+            if (lastMessageAuthor == element.author){
+              if(timeDiff == false){
+                var temp = bodyText(element.body)
+              } else {
+                var temp = avatarBodyText(element.body,element.created,element.id,element.username,element.url);
+              }
+              $("#body").append(temp);
+            } else {
+              var temp = avatarBodyText(element.body,element.created,element.id,element.username,element.url);
+              $("#body").append(temp);
             }
-            else{
-              var last_message = data[count];
-              console.log("New message");
-              console.log(last_message);
-              count++;
-              var temp =
-                '<div class="thread__top">'+
-                    '<div class="thread__author">'+  
-                      '<a href = {% url "user-profile" to_user.id %} class="thread__authorInfo">'+  
-                        '<div class="avatar avatar--small">'+
-                          '<img src="{{to_user.avatar.url}}"/>'+
-                        '</div>'+
-                        '<span>'+'@'+"{{to_user.username}}"+'</span>'+
-                      '</a>'+
-                      //'<span class="thread__date">'+response.messages[key].created+'</span>'+
-                    '</div>'+
-                  '</div>'+
-                '<div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">'+
-                    last_message+
-                ' </div>';
-            $("#body").append(temp);
-            var e = document.getElementById('body');
-            e.scrollTop = e.scrollHeight;
-            }
-        }
+          });
+          count = count + counter;
+          var e = document.getElementById('body');
+          e.scrollTop = e.scrollHeight;
+        },
+        error:function(response){
+          alert("an error");
+      }
     });
 }
 $(function(){
-    setInterval(refresh, 100);
+    setInterval(refresh, 1000);
 });
 
+function bodyText(body) {
+    return '<div style="padding-left: 40px;">'+ body+'</div>'
+  }
+
+function avatarBodyText(body,created,id,username,avatar){
+    return '<div class="d-flex align-items-center">'+
+              '<a href= {% url "user-profile" '+ id +' %} class=" d-flex align-items-center" style=" text-decoration: none; color: #6D5D6E;">'+
+                '<div class="avatar avatar--small" style="padding-right: 8px;" >'+
+                  '<img src='+avatar+' style=" border: 3px solid #b6aeb6;" />'+
+                '</div>'+
+                '<div class="col">'+
+                  '<div class = " fw-bold " style="color: #b6aeb6;">'+
+                    '@'+username+
+                  '</div>'+
+                '</div>'+
+              '</a>'+
+              '<div class="px-3">'+created+'</div>'+
+            '</div>'+
+            '<div style="padding-left: 40px;">'+body+'</div>'
+  }
 
 $(document).on('submit','#post-form',function(e){
   e.preventDefault();
+  console.log("{{request.user}}")
   console.log("Create chat message is working")
-  console.log("{{to_user.id}}")
   $.ajax({
     type:"POST",
     url: "{% url 'create' to_user.id %}",
@@ -289,26 +230,17 @@ $(document).on('submit','#post-form',function(e){
       csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
   },
   success:function(data){
-    //alert("Data succcefully updated")
-    console.log(data);
-    var temp =
-                '<div class="thread__top">'+
-                    '<div class="thread__author">'+  
-                      '<a href = {% url "user-profile" user.id %} class="thread__authorInfo">'+  
-                        '<div class="avatar avatar--small">'+
-                          '<img src="{{user.avatar.url}}"/>'+
-                        '</div>'+
-                        '<span>'+'@'+"{{user.username}}"+'</span>'+
-                      '</a>'+
-                      //'<span class="thread__date">'+response.messages[key].created+'</span>'+
-                    '</div>'+
-                  '</div>'+
-                '<div class="thread__details" style = "padding-left: 50px;margin-top: 0px;">'+
-                    data.body+
-                ' </div>';
-    $("#body").append(temp);
-
-
+    if (data.lastMessageAuthor == "{{user.email}}"){
+      if(data.timeDiff == false){
+        var temp = bodyText(data.body)
+      } else {
+        var temp = avatarBodyText(data.body,data.created,"{{request.user.id}}","{{request.user.username}}","{{request.user.avatar.url}}");
+      }
+      $("#body").append(temp);
+    } else {
+      var temp = avatarBodyText(data.body,data.created,"{{request.user.id}}","{{request.user.username}}","{{request.user.avatar.url}}");
+      $("#body").append(temp);
+    }
     const firstNameInput = document.getElementById('form-body');
     firstNameInput.value = '';
     var e = document.getElementById('body');
@@ -319,8 +251,6 @@ $(document).on('submit','#post-form',function(e){
       }
     });
   });
-
-
 
 </script>
 

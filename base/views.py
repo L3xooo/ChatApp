@@ -1,3 +1,5 @@
+import datetime
+import json
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from .models import ChatMessage, Room, Topic, Message, User, Friend_request
@@ -21,19 +23,16 @@ from django.http import JsonResponse
 def loginPage(request):
     if request.user.is_authenticated:
         return redirect('home')
-    if request.method == 'POST':
+    if request.method == 'POST': 
         form = LoginForm(request.POST or None)
         if form.is_valid():
             user = form.login(request)
-            print(user)
             if user:
                 login(request, user)
                 return redirect("home")
-        else:
-            print(form.errors)
     else:
         form = LoginForm()
-    return render(request, 'base/login.html', {'form': form})
+    return render(request, 'base/login.html',{"form" : form})
 
 
 def forget_passwordPage(request):
@@ -81,7 +80,6 @@ def activate(request, uidb64, token):
             form = NewPasswordForm(request.POST or None)
             if form.is_valid():
                 password = request.POST.get('new_password')
-                print(password)
                 user.set_password(password)
                 user.save()
                 success = True
@@ -96,16 +94,10 @@ def passwordChange(request, pk):
     if request.method == "POST":
         form = NewPasswordForm(request.POST or None)
         old_password = request.POST.get('old_password')
-        print(old_password)
-        print(form.old_password_flag)
-
         if check_password(old_password, user.password) == False:
             form.old_password_flag = False
-            print(form.old_password_flag)
-
         if form.is_valid():
             password = request.POST.get('new_password')
-            print(password)
             user.set_password(password)
             user.save()
             success = True
@@ -140,12 +132,10 @@ def registerPage(request):
                 name=name,
                 email=email
             )
-            print(user)
             return redirect('home')
         else:
             messages.error(request, 'hesla sa nezhoduju')
             return render(request, 'base/signup.html', context={'name': name, 'username': username, 'email': email})
-
     return render(request, "base/signup.html", context={})
 
 
@@ -161,17 +151,26 @@ def topics(request):
 
 
 def home(request):
-    q = request.GET.get('q') if request.GET.get('q') != None else ''
-    rooms = Room.objects.filter(
+    if request.GET.get('k') != None:
+        q = request.GET.get('k')
+        rooms = Room.objects.filter(
+        Q(topic__name=q))
+        room_messages = Message.objects.filter(Q(
+        room__topic__name=q))[:2]
+    else:
+        if request.GET.get('q') != None:
+            q = request.GET.get('k')
+        else:
+            q = ''
+        rooms = Room.objects.filter(
         Q(topic__name__icontains=q) |
         Q(name__icontains=q) |
         Q(description__icontains=q)
-    )
-    topics = Topic.objects.all()[:5]
-    room_count = rooms.count()
-    room_messages = Message.objects.filter(Q(
+        )
+        room_messages = Message.objects.filter(Q(
         room__topic__name__icontains=q))[:2]
-
+    topics = Topic.objects.all()
+    room_count = rooms.count()
     paginator = Paginator(rooms, 3)
     page_number = request.GET.get('page')
     test = paginator.get_page(page_number)
@@ -190,29 +189,20 @@ def home(request):
                    'friends': friends, 'send': send, 'test': test, 'fr_req': fr_req, "to_user": to_user, 'from_user': from_user}
     else:
         users = User.objects.all()
-        print(Friend_request.objects.all())
         context = {'rooms': rooms, 'topics': topics,
                    'room_count': room_count, 'room_messages': room_messages, 'users': users, 'test': test}
     return render(request, 'base/home.html', context)
 
 
 def room(request, pk):
+    user = request.user
     room = Room.objects.get(id=pk)
     room_messages = room.message_set.all().order_by('created')
-    print(room_messages)
     participants = room.participants.all()
-    print(participants)
-    if request.method == "POST":
-        message = Message.objects.create(
-            user=request.user,
-            room=room,
-            body=request.POST.get('body')
-        )
-        room.participants.add(request.user)  # add to many to many field
-        return redirect('room', pk=room.id)
-
+    room_messages_count = room_messages.count()
+    test = room.message_set.filter(~Q(author = user)).count()
     context = {'room': room, 'room_messages': room_messages,
-               'participants': participants}
+               'participants': participants,'count' : test}
     return render(request, 'base/room.html', context)
 
 
@@ -230,7 +220,6 @@ def userProfile(request, pk):
 
     context = {'user': user, 'rooms': rooms, 'room_messages': room_messages,
                'topics': topics, 'friends': friends, 'test': test}
-    print(friends)
     return render(request, 'base/profile.html', context)
 
 
@@ -239,14 +228,10 @@ def settings(request, pk):
     user = User.objects.get(id=pk)
     if request.method == "POST":
         myfile = request.FILES['avatar']
-        print(myfile)
         fs = FileSystemStorage()
         name = fs.save(myfile.name, myfile)
         url = fs.url(name)
-        print(f"url obrazka = {url}")
         user.avatar = name
-        print(f"url user.avatar = {user.avatar.url}")
-        print(user.avatar)
         user.save()
         return redirect('user-profile', pk=user.id)
     else:
@@ -261,13 +246,18 @@ def createRoom(request):
     topics = Topic.objects.all()
     if request.method == 'POST':
         topic_name = request.POST.get('topic')
-        topic, created = Topic.objects.get_or_create(name=topic_name)
-        Room.objects.create(
+        if topic_name == "Other":
+            topic = Topic.objects.create(name = request.POST.get("room_topic"))
+        else:
+            topic = Topic.objects.get(name = topic_name)
+        room = Room.objects.create(
             host=request.user,
             topic=topic,
-            name=request.POST.get('name'),
+            name=request.POST.get('room_name'),
             description=request.POST.get('description'),
         )
+        room.participants.add(request.user)
+        room.save()
         return redirect('home')
 
     context = {'form': form, 'topics': topics, 'method': method}
@@ -297,10 +287,8 @@ def updateRoom(request, pk):
 @login_required(login_url='login')
 def deleteRoom(request, pk):
     room = Room.objects.get(id=pk)
-
     if request.user != room.host:
         return HttpResponse('You are not allowed here')
-
     if request.method == "POST":
         room.delete()
         return redirect('home')
@@ -344,7 +332,6 @@ def accept_friend_request(request, pk):
     else:
         return HttpResponse("not accepted")
 
-
 @login_required(login_url='login')
 def decline_friend_request(request, pk):
     friend_request = Friend_request.objects.get(id=pk)
@@ -354,14 +341,12 @@ def decline_friend_request(request, pk):
     else:
         return HttpResponse("not declined")
 
-
 @login_required(login_url='login')
 def friends_view(request, pk):
     user = request.user
     friends = user.friends.all()
     context = {'user': user, 'friends': friends}
     return render(request, 'base/friends.html', context)
-
 
 @login_required(login_url='login')
 def unfriend(request, pk):
@@ -371,60 +356,84 @@ def unfriend(request, pk):
     friend.friends.remove(user)
     return redirect('friends', pk=user.id)
 
-
 def chat_view(request, pk):
     user = request.user
     to_user = User.objects.get(id=pk)
     friends = user.chat_with.all()
     user_messages = ChatMessage.objects.filter(author=user, reciever=to_user)
     to_user_messages = ChatMessage.objects.filter(
-        author=to_user, reciever=user)
+    author=to_user, reciever=user)
     to_user_messages.update(seen=True)
-    chat_messages = (user_messages | to_user_messages).order_by('created')
     message_count = to_user_messages.count()
+    all_messages_count = (user_messages | to_user_messages).count()
+    if(all_messages_count-50 > 0):
+        chat_messages = (user_messages | to_user_messages).order_by('created')[all_messages_count-50:]
+    else:
+        chat_messages = (user_messages | to_user_messages).order_by('created')
     arr = []
     for friend in friends:
         temp = ChatMessage.objects.filter(
             seen=False, author=friend, reciever=user).count()
         arr.append(temp)
     foo = zip(friends, arr)
-    context = {'user': user, 'to_user': to_user,
+    context = {'user': user, 'to_user': to_user,'all_messages_count':all_messages_count,
                'chat_messages': chat_messages, 'foo': foo, 'message_count': message_count}
     return render(request, 'base/chat.html', context)
 
-
-#def test(request):
-#    user = request.user
-#    friends = user.chat_with.all()
-#    return JsonResponse({"friends": list(friends.values())})
-
-
-def test1(request, pk):
+def createRoomMessage(request,pk):
+    room = Room.objects.get(id=pk)
     user = request.user
-    to_user = User.objects.get(id=pk)
-    friends = user.chat_with.all()
-    user_messages = ChatMessage.objects.filter(author=user, reciever=to_user)
-    to_user_messages = ChatMessage.objects.filter(
-        author=to_user, reciever=user)
-    to_user_messages.update(seen=True)
-    chat_messages = (user_messages | to_user_messages).order_by('created')
-    test1 = User.objects.filter(email=user).values('id', 'avatar', 'username')
-    test2 = User.objects.filter(email=to_user).values(
-        'id', 'avatar', 'username')
-    return JsonResponse({'messages': list(chat_messages.values()), 'data': list(test1), 'data1': list(test2)})
-
+    lastRoomMessage = room.message_set.all()
+    if lastRoomMessage:
+        lastMessageAuthor = lastRoomMessage[0].author.email
+        lastMessageCreated = lastRoomMessage[0].created
+    else:
+        lastMessageAuthor = None
+        lastMessageCreated = None
+    response = {}
+    if request.method == "POST":
+        body = request.POST.get('body')
+        message = Message(body=body, author=user, room = room)
+        message.save()
+        if (message.created-lastMessageCreated > datetime.timedelta(hours = 0, minutes = 1, seconds = 0)):
+            timeDiff = True
+        else:
+            timeDiff = False
+        created = message.created.strftime("%B %d %Y %I:%M p.m.")
+        response = {"body":body,
+                    "author":user.email,
+                    "lastMessageAuthor":lastMessageAuthor,
+                    "timeDiff":timeDiff,
+                    "created":created
+                    }
+        if user not in room.participants.all():
+            room.participants.add(user)
+        return JsonResponse(response, safe=False)
+    
 
 def create(request, pk):
     user = request.user
     to_user = User.objects.get(id=pk)
-    last_message = ChatMessage.objects.last()
-    print(last_message.author)
+    last_chat_message = ((ChatMessage.objects.filter(author=user, reciever=to_user)) | 
+    (ChatMessage.objects.filter(author = to_user,reciever = user))).reverse()[0]
+    lastMessageAuthor = last_chat_message.author.email
+    lastMessageCreated = last_chat_message.created
     response = {}
     if request.method == "POST":
         body = request.POST.get('body')
         message = ChatMessage(body=body, author=user, reciever=to_user)
         message.save()
-        response['body'] = body
+        messageTimeDiff = message.created-lastMessageCreated
+        if(messageTimeDiff > datetime.timedelta(hours = 0, minutes = 1, seconds = 0)):
+            timeDiff = True
+        else:
+            timeDiff = False
+        created = message.created.strftime("%B %d %Y %I:%M p.m.")
+        response = {"body":body,
+                    "lastMessageAuthor":lastMessageAuthor,
+                    "timeDiff":timeDiff,
+                    "created":created
+                    }
         if user not in to_user.chat_with.all():
             to_user.chat_with.add(user)
         if to_user not in user.chat_with.all():
@@ -435,10 +444,86 @@ def receive_chat_message(request,pk):
     user = request.user
     to_user = User.objects.get(id=pk)
     message = ChatMessage.objects.filter(author = to_user ,reciever = user)    
+    if 'message' in request.GET:
+        displayedMessageCount = int(request.GET['message'])
+    allMessagesCount = len(message) 
+    last_chat_message = ((ChatMessage.objects.filter(author=user, reciever=to_user)) | 
+    (ChatMessage.objects.filter(author = to_user,reciever = user))).reverse()[allMessagesCount-displayedMessageCount]
+    lastMessageAuthor = last_chat_message.author.email
+    lastMessageCreated = last_chat_message.created    
+
     message_array = []
-    for chat in message:
-        #print(chat)
-        message_array.append(chat.body)
+    timeDiff = False
+    for index in range(displayedMessageCount,allMessagesCount):
+        if (index == displayedMessageCount):
+            messageTimeDiff = message[index].created - lastMessageCreated
+        created = message[index].created.strftime("%B %d %Y %I:%M p.m.")
+        message_array.append({"body": message[index].body,
+                              "created" : created,
+                              "author" : message[index].author.email,
+                              "id" : message[index].author.id,
+                              "username" : message[index].author.username,
+                              "url": message[index].author.avatar.url})        
+        if(messageTimeDiff > datetime.timedelta(hours = 0, minutes = 1, seconds = 0)):
+            timeDiff = True
+        else:
+            timeDiff = False
+    return JsonResponse({"message_array":message_array,"timeDiff" : timeDiff,
+                         "lastMessageAuthor" : lastMessageAuthor},safe = False)
+
+def receive_room_message(request,pk):
+    user = request.user
+    room = Room.objects.get(id = pk)
+    room_messages = room.message_set.all().order_by('created')
+    test = room.message_set.filter(~Q(author = user)).reverse()
+    if 'message' in request.GET:
+        displayedMessageCount = int(request.GET['message'])
+    allMessagesCount = len(test) 
+    last_chat_message = room_messages.reverse()[1]
+    lastMessageAuthor = last_chat_message.author.email
+    lastMessageCreated = last_chat_message.created    
+    message_array = []
+    timeDiff = False
+
+    for index in range(displayedMessageCount,allMessagesCount):
+        if (index == displayedMessageCount):
+            messageTimeDiff = test[index].created - lastMessageCreated
+        created = test[index].created.strftime("%B %d %Y %I:%M p.m.")
+        message_array.append({"body": test[index].body,
+                              "created" : created,
+                              "author" : test[index].author.email,
+                              "id" : test[index].author.id,
+                              "username" : test[index].author.username,
+                              "url": test[index].author.avatar.url})        
+        if(messageTimeDiff > datetime.timedelta(hours = 0, minutes = 1, seconds = 0)):
+            timeDiff = True
+        else:
+            timeDiff = False
+    return JsonResponse({"message_array":message_array,"timeDiff" : timeDiff,
+                         "lastMessageAuthor" : lastMessageAuthor},safe = False)
+
+def load_more(request,pk,value):
+    user = request.user
+    to_user = User.objects.get(id=pk)
+    print(value)
+    message_array = []
+    if value > 0 and (value-40) > 0:
+        messages = (ChatMessage.objects.filter(author = to_user,reciever = user) 
+        |ChatMessage.objects.filter(author = user,reciever = to_user))[value-40:value]
+    elif value > 0 and (value-40) < 0:
+        messages = (ChatMessage.objects.filter(author = to_user,reciever = user)|
+        ChatMessage.objects.filter(author = user,reciever = to_user))[0:value]
+    else:
+        messages = []
+
+    for message in messages:
+        tmp = { "author": message.author.username,
+                "body" : message.body,
+                "created" : message.created,
+                "seen" : message.seen       
+        }
+        message_array.append(tmp)
+    print(messages)
     return JsonResponse(message_array,safe = False)
 
 def delete_from_chat(request, pk):

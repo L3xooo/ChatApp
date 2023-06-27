@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'widget_tweaks',
     #my apps
     'base',
 ]
@@ -142,5 +143,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_USE_TLS = True  
 EMAIL_HOST = 'smtp.gmail.com'  
 EMAIL_HOST_USER = 'wexxyo@gmail.com'  
-EMAIL_HOST_PASSWORD = 'xpbpowkckbpxoywv'  
+EMAIL_HOST_PASSWORD = 'xhrnvkhnictkhuli'  
 EMAIL_PORT = 587  
