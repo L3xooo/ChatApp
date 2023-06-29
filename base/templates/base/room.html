@@ -210,8 +210,10 @@
             }
           });
           count = parseInt(count) + counter;
-          var e = document.getElementById('body');
-          e.scrollTop = e.scrollHeight;
+          if (counter > 0) {
+            var e = document.getElementById('body');
+            e.scrollTop = e.scrollHeight;
+          }
         },
         error:function(response){
           alert("an error");

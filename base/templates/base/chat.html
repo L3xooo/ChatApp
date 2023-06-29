@@ -36,6 +36,10 @@ a.delete svg{
   justify-content: center;
 }
 
+.friend.active{
+  background-color: #b6aeb6;
+}
+
 </style>
 <main>
   <div class="container py-5" style="height: 90vh;">
@@ -50,7 +54,7 @@ a.delete svg{
             <div class="col">
               {% for friend,test in foo %}
               <div class="friend row px-2">
-                  <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between friend {% if friend.id == to_user.id %} active {% endif %} ">
                       <a href="{% url 'chat' friend.id %}" class="py-2 d-flex align-items-center w-100" style="text-decoration: none; color: #6D5D6E;">
                         <div class="avatar avatar--medium" style="padding-right: 8px;" >
                           <img src="{{friend.avatar.url}}" style=" border: 3px solid #393646;"/>
@@ -185,8 +189,10 @@ function refresh() {
             }
           });
           count = count + counter;
-          var e = document.getElementById('body');
-          e.scrollTop = e.scrollHeight;
+          if (counter > 0) {
+            var e = document.getElementById('body');
+            e.scrollTop = e.scrollHeight;
+          }
         },
         error:function(response){
           alert("an error");
